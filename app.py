@@ -138,6 +138,19 @@ def get_student(id):
         "cgpa": student.cgpa
     })
 
+@app.route("/api/students/<int:id>", methods=["DELETE"])
+def delete_student(id):
+
+    student = Student.query.get(id)
+
+    if not student:
+        return jsonify({"error": "Student not found"}), 404
+
+    db.session.delete(student)
+    db.session.commit()
+
+    return jsonify({"message": "Student deleted successfully"})
+
 
 
 
