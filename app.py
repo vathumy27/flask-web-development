@@ -58,6 +58,15 @@ def create_student():
 
     if not data.get("joined_date"):
             return jsonify({"error": "Joined date is required"}), 400
+    
+    existing_student = Student.query.filter_by(
+            email=data["email"]
+        ).first()
+
+    if existing_student:
+            return jsonify({
+                "error": "Email already exists"
+            }), 400
 
         
 
