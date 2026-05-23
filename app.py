@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy import text
 
 app = Flask(__name__)
 
@@ -25,6 +26,15 @@ class Student(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class Course(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    course_title = db.Column(db.String(100), unique=True, nullable=False)
+    course_fee = db.Column(db.Float, nullable=False)
+    duration_months = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    is_available = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     
 
@@ -77,125 +87,162 @@ def create_student():
 
         
 
-@app.route("/api/students", methods=["GET"])
-def get_students():
-
-    students = Student.query.all()
-
-    output = []
-
-    for student in students:
-
-        output.append({
-            "id": student.id,
-            "full_name": student.full_name,
-            "email": student.email,
-            "age": student.age,
-            "cgpa": student.cgpa,
-            "is_active": student.is_active,
-            "joined_date": str(student.joined_date)
-        })
-
-    return jsonify(output), 200
-
-@app.route("/api/students", methods=["GET"])
-def get_students():
-
-    students = Student.query.all()
-
-    output = []
-
-    for student in students:
-
-        output.append({
-            "id": student.id,
-            "full_name": student.full_name,
-            "email": student.email,
-            "age": student.age,
-            "cgpa": student.cgpa,
-            "is_active": student.is_active,
-            "joined_date": str(student.joined_date)
-        })
-
-    return jsonify(output), 200
 
 
-@app.route("/api/students/<int:id>", methods=["GET"])
-def get_student(id):
+# @app.route("/api/students", methods=["GET"])
+# def get_students():
 
-    student = Student.query.get(id)
+#     students = Student.query.all()
 
-    if not student:
-        return jsonify({
-            "error": "Student not found"
-        }), 404
+#     output = []
 
-    return jsonify({
-        "id": student.id,
-        "full_name": student.full_name,
-        "email": student.email,
-        "age": student.age,
-        "cgpa": student.cgpa
-    })
+#     for student in students:
 
+#         output.append({
+#             "id": student.id,
+#             "full_name": student.full_name,
+#             "email": student.email,
+#             "age": student.age,
+#             "cgpa": student.cgpa,
+#             "is_active": student.is_active,
+#             "joined_date": str(student.joined_date)
+#         })
 
-@app.route("/api/students/<int:id>", methods=["PUT"])
-def update_student(id):
-
-    student = Student.query.get(id)
-
-    if not student:
-        return jsonify({"error": "Student not found" }), 404
-
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-
-    if "full_name" in data:
-        student.full_name = data["full_name"]
-
-    if "email" in data:
-
-        existing_email = Student.query.filter(
-            Student.email == data["email"],
-            Student.id != id
-        ).first()
-
-        if existing_email:
-            return jsonify({"error": "Email already exists"}), 400
-
-        student.email = data["email"]
-
-    if "age" in data:
-
-        if int(data["age"]) <= 0:
-            return jsonify({"error": "Age must be positive"}), 400
-
-        student.age = data["age"]
-
-    if "cgpa" in data:
-        student.cgpa = data["cgpa"]
-
-    db.session.commit()
-
-    return jsonify({"message": "Student updated successfully"})
-
-@app.route("/api/students/<int:id>", methods=["DELETE"])
-def delete_student(id):
-
-    student = Student.query.get(id)
-
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
-
-    db.session.delete(student)
-    db.session.commit()
-
-    return jsonify({"message": "Student deleted successfully"})
+#     return jsonify(output), 200
 
 
 
+# @app.route("/api/students", methods=["GET"])
+# def get_students():
+
+#     students = Student.query.all()
+
+#     output = []
+
+#     for student in students:
+
+#         output.append({
+#             "id": student.id,
+#             "full_name": student.full_name,
+#             "email": student.email,
+#             "age": student.age,
+#             "cgpa": student.cgpa,
+#             "is_active": student.is_active,
+#             "joined_date": str(student.joined_date)
+#         })
+
+#     return jsonify(output), 200
+
+
+
+
+
+
+# @app.route("/api/students/<int:id>", methods=["GET"])
+# def get_student(id):
+
+#     student = Student.query.get(id)
+
+#     if not student:
+#         return jsonify({
+#             "error": "Student not found"
+#         }), 404
+
+#     return jsonify({
+#         "id": student.id,
+#         "full_name": student.full_name,
+#         "email": student.email,
+#         "age": student.age,
+#         "cgpa": student.cgpa
+#     })
+
+
+
+
+
+# @app.route("/api/students/<int:id>", methods=["PUT"])
+# def update_student(id):
+
+#     student = Student.query.get(id)
+
+#     if not student:
+#         return jsonify({"error": "Student not found" }), 404
+
+#     data = request.get_json()
+
+#     if not data:
+#         return jsonify({"error": "No data provided"}), 400
+
+#     if "full_name" in data:
+#         student.full_name = data["full_name"]
+
+#     if "email" in data:
+
+#         existing_email = Student.query.filter(
+#             Student.email == data["email"],
+#             Student.id != id
+#         ).first()
+
+#         if existing_email:
+#             return jsonify({"error": "Email already exists"}), 400
+
+#         student.email = data["email"]
+
+#     if "age" in data:
+
+#         if int(data["age"]) <= 0:
+#             return jsonify({"error": "Age must be positive"}), 400
+
+#         student.age = data["age"]
+
+#     if "cgpa" in data:
+#         student.cgpa = data["cgpa"]
+
+#     db.session.commit()
+
+#     return jsonify({"message": "Student updated successfully"})
+
+
+
+
+
+
+# @app.route("/api/students/<int:id>", methods=["DELETE"])
+# def delete_student(id):
+
+#     student = Student.query.get(id)
+
+#     if not student:
+#         return jsonify({"error": "Student not found"}), 404
+
+#     db.session.delete(student)
+#     db.session.commit()
+
+#     return jsonify({"message": "Student deleted successfully"})
+
+
+
+
+
+if __name__ == "__main__":
+
+    try:
+
+        with app.app_context():
+
+            db.session.execute(text("SELECT 1"))
+
+            print("SUCCESS: Database Connected Successfully")
+
+            db.create_all()
+
+    except Exception as e:
+
+        print("ERROR: Database Connection Failed")
+
+        print(e)
+
+    app.run(debug=True)
 
 
 
