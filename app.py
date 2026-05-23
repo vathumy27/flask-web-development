@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -23,8 +23,42 @@ class Student(db.Model):
     joined_date = db.Column(db.Date, nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+
     
-    
 
+@app.route("/")
+def home():
+    return jsonify({
+        "message": "Flask + MySQL Connected Successfully"
+    })
 
+@app.route("/api/students", methods=["POST"])
+def create_student():
 
+    data = request.get_json()
+
+        
+
+    if not data:
+            return jsonify({ "error": "No input data provided"}), 400
+
+    if not data.get("full_name"):
+            return jsonify({"error": "Full name is required"}), 400
+
+    if not data.get("email"):
+            return jsonify({"error": "Email is required"}), 400
+
+    if not data.get("age"):
+            return jsonify({"error": "Age is required"}), 400
+
+    if int(data["age"]) <= 0:
+            return jsonify({"error": "Age must be a positive integer"}), 400
+
+    if not data.get("joined_date"):
+            return jsonify({"error": "Joined date is required"}), 400
+
+        
+
+        
