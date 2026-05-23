@@ -138,6 +138,49 @@ def get_student(id):
         "cgpa": student.cgpa
     })
 
+
+@app.route("/api/students/<int:id>", methods=["PUT"])
+def update_student(id):
+
+    student = Student.query.get(id)
+
+    if not student:
+        return jsonify({"error": "Student not found" }), 404
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "full_name" in data:
+        student.full_name = data["full_name"]
+
+    if "email" in data:
+
+        existing_email = Student.query.filter(
+            Student.email == data["email"],
+            Student.id != id
+        ).first()
+
+        if existing_email:
+            return jsonify({"error": "Email already exists"}), 400
+
+        student.email = data["email"]
+
+    if "age" in data:
+
+        if int(data["age"]) <= 0:
+            return jsonify({"error": "Age must be positive"}), 400
+
+        student.age = data["age"]
+
+    if "cgpa" in data:
+        student.cgpa = data["cgpa"]
+
+    db.session.commit()
+
+    return jsonify({"message": "Student updated successfully"})
+
 @app.route("/api/students/<int:id>", methods=["DELETE"])
 def delete_student(id):
 
