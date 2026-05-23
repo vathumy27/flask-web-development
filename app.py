@@ -77,4 +77,49 @@ def create_student():
 
         
 
-        
+@app.route("/api/students", methods=["GET"])
+def get_students():
+
+    students = Student.query.all()
+
+    output = []
+
+    for student in students:
+
+        output.append({
+            "id": student.id,
+            "full_name": student.full_name,
+            "email": student.email,
+            "age": student.age,
+            "cgpa": student.cgpa,
+            "is_active": student.is_active,
+            "joined_date": str(student.joined_date)
+        })
+
+    return jsonify(output), 200
+
+@app.route("/api/students", methods=["GET"])
+def get_students():
+
+    students = Student.query.all()
+
+    output = []
+
+    for student in students:
+
+        output.append({
+            "id": student.id,
+            "full_name": student.full_name,
+            "email": student.email,
+            "age": student.age,
+            "cgpa": student.cgpa,
+            "is_active": student.is_active,
+            "joined_date": str(student.joined_date)
+        })
+
+    return jsonify(output), 200
+
+
+
+
+
