@@ -281,6 +281,35 @@ def create_course():
         return jsonify({
             "error": str(e)
         }), 500
+    
+
+
+# Course........................
+
+@app.route("/api/courses", methods=["GET"])
+def get_courses():
+
+    courses = Course.query.all()
+
+    output = []
+
+    for course in courses:
+
+        output.append({
+            "id": course.id,
+            "course_title": course.course_title,
+            "course_fee": course.course_fee,
+            "duration_months": course.duration_months,
+            "description": course.description
+        })
+
+    return jsonify(output)
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
