@@ -224,6 +224,65 @@ def create_student():
 
 
 
+
+
+
+
+
+@app.route("/api/courses", methods=["POST"])
+def create_course():
+
+    try:
+
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No input data provided"}), 400
+
+        if not data.get("course_title"):
+           return jsonify({"error": "Course title is required"}), 400
+
+        if not data.get("course_fee"):
+            return jsonify({"error": "Course fee is required"}), 400
+
+        if float(data["course_fee"]) <= 0:
+            return jsonify({"error": "Course fee must be positive"}), 400
+
+        if not data.get("duration_months"):
+            return jsonify({"error": "Duration is required"}), 400
+
+        if int(data["duration_months"]) <= 0:
+            return jsonify({"error": "Duration must be positive"}), 400
+
+        existing_course = Course.query.filter_by(
+            course_title=data["course_title"]
+        ).first()
+
+        if existing_course:
+            return jsonify({
+                "error": "Course title already exists"
+            }), 400
+
+        course = Course(
+            course_title=data["course_title"],
+            course_fee=data["course_fee"],
+            duration_months=data["duration_months"],
+            description=data.get("description")
+        )
+
+        db.session.add(course)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Course created successfully"
+        }), 201
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 500
+
+
 if __name__ == "__main__":
 
     try:
