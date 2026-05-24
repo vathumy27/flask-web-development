@@ -16,7 +16,6 @@ class Student(db.Model):
     full_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     age = db.Column(db.Integer, nullable=False)
-
     cgpa = db.Column(db.Float, default=0.0)
 
     is_active = db.Column(db.Boolean, default=True)
@@ -38,52 +37,53 @@ class Course(db.Model):
 
     
 
-@app.route("/")
-def home():
-    return jsonify({
-        "message": "Flask + MySQL Connected Successfully"
-    })
+# @app.route("/")
+# def home():
+#     return jsonify({
+#         "message": "Flask + MySQL Connected Successfully"
+#     })
 
-@app.route("/api/students", methods=["POST"])
-def create_student():
+# @app.route("/api/students", methods=["POST"])
+# def create_student():
 
-    data = request.get_json()
+#     data = request.get_json()
 
-    try:
+#     try:
 
-            if not data:
-             return jsonify({ "error": "No input data provided"}), 400
+#             if not data:
+#              return jsonify({ "error": "No input data provided"}), 400
 
-            if not data.get("full_name"):
-             return jsonify({"error": "Full name is required"}), 400
+#             if not data.get("full_name"):
+#              return jsonify({"error": "Full name is required"}), 400
 
-            if not data.get("email"):
-             return jsonify({"error": "Email is required"}), 400
+#             if not data.get("email"):
+#              return jsonify({"error": "Email is required"}), 400
 
-            if not data.get("age"):
-             return jsonify({"error": "Age is required"}), 400
+#             if not data.get("age"):
+#              return jsonify({"error": "Age is required"}), 400
 
-            if int(data["age"]) <= 0:
-             return jsonify({"error": "Age must be a positive integer"}), 400
+#             if int(data["age"]) <= 0:
+#              return jsonify({"error": "Age must be a positive integer"}), 400
 
-            if not data.get("joined_date"):
-             return jsonify({"error": "Joined date is required"}), 400
+#             if not data.get("joined_date"):
+#              return jsonify({"error": "Joined date is required"}), 400
     
-            existing_student = Student.query.filter_by(email=data["email"]).first()
+#             existing_student = Student.query.filter_by(email=data["email"]).first()
 
-            if existing_student:
-             return jsonify({"error": "Email already exists"}), 400
+#             if existing_student:
+#              return jsonify({"error": "Email already exists"}), 400
     
-            student = Student(full_name=data["full_name"],email=data["email"],age=data["age"],cgpa=data.get("cgpa", 0.0),joined_date=datetime.strptime(data["joined_date"],"%Y-%m-%d").date())
+#             student = Student(full_name=data["full_name"],email=data["email"],age=data["age"],cgpa=data.get("cgpa", 0.0),
+#                               joined_date=datetime.strptime(data["joined_date"],"%Y-%m-%d").date())
 
-            db.session.add(student)
-            db.session.commit()
+#             db.session.add(student)
+#             db.session.commit()
 
-            return jsonify({
-            "message": "Student created successfully"}), 201
+#             return jsonify({
+#             "message": "Student created successfully"}), 201
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
         
 
@@ -109,30 +109,6 @@ def create_student():
 #         })
 
 #     return jsonify(output), 200
-
-
-
-# @app.route("/api/students", methods=["GET"])
-# def get_students():
-
-#     students = Student.query.all()
-
-#     output = []
-
-#     for student in students:
-
-#         output.append({
-#             "id": student.id,
-#             "full_name": student.full_name,
-#             "email": student.email,
-#             "age": student.age,
-#             "cgpa": student.cgpa,
-#             "is_active": student.is_active,
-#             "joined_date": str(student.joined_date)
-#         })
-
-#     return jsonify(output), 200
-
 
 
 
@@ -226,65 +202,63 @@ def create_student():
 
 
 
+# Course........................
 
 
+# @app.route("/api/courses", methods=["POST"])
+# def create_course():
 
-@app.route("/api/courses", methods=["POST"])
-def create_course():
+#     try:
 
-    try:
+#         data = request.get_json()
 
-        data = request.get_json()
+#         if not data:
+#             return jsonify({"error": "No input data provided"}), 400
 
-        if not data:
-            return jsonify({"error": "No input data provided"}), 400
+#         if not data.get("course_title"):
+#            return jsonify({"error": "Course title is required"}), 400
 
-        if not data.get("course_title"):
-           return jsonify({"error": "Course title is required"}), 400
+#         if not data.get("course_fee"):
+#             return jsonify({"error": "Course fee is required"}), 400
 
-        if not data.get("course_fee"):
-            return jsonify({"error": "Course fee is required"}), 400
+#         if float(data["course_fee"]) <= 0:
+#             return jsonify({"error": "Course fee must be positive"}), 400
 
-        if float(data["course_fee"]) <= 0:
-            return jsonify({"error": "Course fee must be positive"}), 400
+#         if not data.get("duration_months"):
+#             return jsonify({"error": "Duration is required"}), 400
 
-        if not data.get("duration_months"):
-            return jsonify({"error": "Duration is required"}), 400
+#         if int(data["duration_months"]) <= 0:
+#             return jsonify({"error": "Duration must be positive"}), 400
 
-        if int(data["duration_months"]) <= 0:
-            return jsonify({"error": "Duration must be positive"}), 400
+#         existing_course = Course.query.filter_by(
+#             course_title=data["course_title"]
+#         ).first()
 
-        existing_course = Course.query.filter_by(
-            course_title=data["course_title"]
-        ).first()
+#         if existing_course:
+#             return jsonify({"error": "Course title already exists"}), 409
 
-        if existing_course:
-            return jsonify({
-                "error": "Course title already exists"
-            }), 400
+#         course = Course(
+#             course_title=data["course_title"],
+#             course_fee=data["course_fee"],
+#             duration_months=data["duration_months"],
+#             description=data.get("description")
+#         )
 
-        course = Course(
-            course_title=data["course_title"],
-            course_fee=data["course_fee"],
-            duration_months=data["duration_months"],
-            description=data.get("description")
-        )
+#         db.session.add(course)
+#         db.session.commit()
 
-        db.session.add(course)
-        db.session.commit()
+#         return jsonify({
+#             "message": "Course created successfully"
+#         }), 201
 
-        return jsonify({
-            "message": "Course created successfully"
-        }), 201
-
-    except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+#     except Exception as e:
+#         return jsonify({
+#             "error": str(e)
+#         }), 500
     
 
 
-# Course........................
+
 
 @app.route("/api/courses", methods=["GET"])
 def get_courses():
@@ -309,6 +283,30 @@ def get_courses():
 
 
 
+@app.route("/api/courses/<int:id>", methods=["GET"])
+def get_course(id):
+
+    course = Course.query.get(id)
+
+    if not course:
+        return jsonify({
+            "error": "Course not found"
+        }), 404
+
+    return jsonify({
+        "id": course.id,
+        "course_title": course.course_title,
+        "course_fee": course.course_fee,
+        "duration_months": course.duration_months
+    })
+
+
+
+
+
+
+
+
 
 
 
@@ -317,17 +315,13 @@ if __name__ == "__main__":
     try:
 
         with app.app_context():
-
             db.session.execute(text("SELECT 1"))
-
             print("SUCCESS: Database Connected Successfully")
-
             db.create_all()
 
     except Exception as e:
 
         print("ERROR: Database Connection Failed")
-
         print(e)
 
     app.run(debug=True)
