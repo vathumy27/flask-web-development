@@ -205,56 +205,56 @@ class Course(db.Model):
 # Course........................
 
 
-# @app.route("/api/courses", methods=["POST"])
-# def create_course():
+@app.route("/api/courses", methods=["POST"])
+def create_course():
 
-#     try:
+    try:
 
-#         data = request.get_json()
+        data = request.get_json()
 
-#         if not data:
-#             return jsonify({"error": "No input data provided"}), 400
+        if not data:
+            return jsonify({"error": "No input data provided"}), 400
 
-#         if not data.get("course_title"):
-#            return jsonify({"error": "Course title is required"}), 400
+        if not data.get("course_title"):
+           return jsonify({"error": "Course title is required"}), 400
 
-#         if not data.get("course_fee"):
-#             return jsonify({"error": "Course fee is required"}), 400
+        if not data.get("course_fee"):
+            return jsonify({"error": "Course fee is required"}), 400
 
-#         if float(data["course_fee"]) <= 0:
-#             return jsonify({"error": "Course fee must be positive"}), 400
+        if float(data["course_fee"]) <= 0:
+            return jsonify({"error": "Course fee must be positive"}), 400
 
-#         if not data.get("duration_months"):
-#             return jsonify({"error": "Duration is required"}), 400
+        if not data.get("duration_months"):
+            return jsonify({"error": "Duration is required"}), 400
 
-#         if int(data["duration_months"]) <= 0:
-#             return jsonify({"error": "Duration must be positive"}), 400
+        if int(data["duration_months"]) <= 0:
+            return jsonify({"error": "Duration must be positive"}), 400
 
-#         existing_course = Course.query.filter_by(
-#             course_title=data["course_title"]
-#         ).first()
+        existing_course = Course.query.filter_by(
+            course_title=data["course_title"]
+        ).first()
 
-#         if existing_course:
-#             return jsonify({"error": "Course title already exists"}), 409
+        if existing_course:
+            return jsonify({"error": "Course title already exists"}), 409
 
-#         course = Course(
-#             course_title=data["course_title"],
-#             course_fee=data["course_fee"],
-#             duration_months=data["duration_months"],
-#             description=data.get("description")
-#         )
+        course = Course(
+            course_title=data["course_title"],
+            course_fee=data["course_fee"],
+            duration_months=data["duration_months"],
+            description=data.get("description")
+        )
 
-#         db.session.add(course)
-#         db.session.commit()
+        db.session.add(course)
+        db.session.commit()
 
-#         return jsonify({
-#             "message": "Course created successfully"
-#         }), 201
+        return jsonify({
+            "message": "Course created successfully"
+        }), 201
 
-#     except Exception as e:
-#         return jsonify({
-#             "error": str(e)
-#         }), 500
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 500
     
 
 
@@ -350,9 +350,18 @@ def update_course(id):
 
 
 
+@app.route("/api/courses/<int:id>", methods=["DELETE"])
+def delete_course(id):
 
+    course = Course.query.get(id)
 
+    if not course:
+        return jsonify({"error": "Course not found"}), 404
 
+    db.session.delete(course)
+    db.session.commit()
+
+    return jsonify({"message": "Course deleted successfully"})
 
 
 
