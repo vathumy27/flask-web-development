@@ -302,6 +302,54 @@ def get_course(id):
 
 
 
+@app.route("/api/courses/<int:id>", methods=["PUT"])
+def update_course(id):
+
+    course = Course.query.get(id)
+
+    if not course:
+        return jsonify({"error": "Course not found"}), 404
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "course_title" in data:
+
+        existing_course = Course.query.filter(
+            Course.course_title == data["course_title"],
+            Course.id != id
+        ).first()
+
+        if existing_course:
+            return jsonify({"error": "Course title already exists"}), 400
+
+        course.course_title = data["course_title"]
+
+    if "course_fee" in data:
+
+        if float(data["course_fee"]) <= 0:
+            return jsonify({"error": "Course fee must be positive"}), 400
+
+        course.course_fee = data["course_fee"]
+
+    if "duration_months" in data:
+
+        if int(data["duration_months"]) <= 0:
+            return jsonify({"error": "Duration must be positive"}), 400
+
+        course.duration_months = data["duration_months"]
+
+    if "description" in data:
+        course.description = data["description"]
+
+    db.session.commit()
+
+    return jsonify({"message": "Course updated successfully"})
+
+
+
 
 
 
